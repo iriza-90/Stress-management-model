@@ -1,47 +1,70 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const { PythonShell } = require("python-shell");
+
+// This file represents the Node.js backend server that would 
+// interface between the React frontend and the Python model
+
+const express = require('express');
+const { spawn } = require('child_process');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const app = express();
-const port = 5000;  // Port for your backend API
+const PORT = process.env.PORT || 3001;
 
-// Middleware to parse JSON requests
+// Middleware
+app.use(cors());
 app.use(bodyParser.json());
 
-// Endpoint for stress prediction
-app.post("/predict", (req, res) => {
-  const { sleep, screenTime, exercise, caffeine, workHours, socialTime } = req.body;
-
-  // Prepare the input data for the model (sent as an array)
-  const inputData = [[sleep, screenTime, exercise, caffeine, workHours, socialTime]];
-
-  // Run the Python script to predict the stress level
-  const options = {
-    mode: "text",
-    pythonPath: "python",  // This will use the global python environment
-    pythonOptions: ["-u"], // Unbuffered output
-    scriptPath: "./backend", // Path to your Python script
-    args: [JSON.stringify(inputData)],  // Pass the input data to the Python script
-  };
-
-  PythonShell.run("predict_stress.py", options, (err, result) => {
-    if (err) {
-      console.error("Error in prediction:", err);
-      return res.status(500).send("Error making prediction");
+// API endpoint to handle stress prediction
+app.post('/api/predict-stress', (req, res) => {
+  const { answers } = req.body;
+  
+  if (!answers || !Array.isArray(answers)) {
+    return res.status(400).json({ error: 'Invalid input: answers must be an array' });
+  }
+  
+  // Prepare data to send to Python script
+  const dataString = JSON.stringify(answers);
+  
+  // Spawn Python process
+  const pythonProcess = spawn('python', ['./model/stress_model.py', dataString]);
+  
+  let result = '';
+  
+  // Collect data from Python script
+  pythonProcess.stdout.on('data', (data) => {
+    result += data.toString();
+  });
+  
+  // Handle errors in Python script
+  pythonProcess.stderr.on('data', (data) => {
+    console.error(`Python Error: ${data}`);
+  });
+  
+  // When Python process ends, send response
+  pythonProcess.on('close', (code) => {
+    if (code !== 0) {
+      console.error(`Python process exited with code ${code}`);
+      return res.status(500).json({ error: 'Model prediction failed' });
     }
-
-    // Log the result for debugging
-    console.log("Python script result:", result);
-
     
-    const prediction = result[0];
-
-    
-    res.json({ predictedStressLevel: prediction });
+    try {
+      const prediction = JSON.parse(result);
+      res.json(prediction);
+    } catch (error) {
+      console.error('Error parsing Python output:', error);
+      res.status(500).json({ error: 'Failed to parse model output' });
+    }
   });
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+// Note: In a production environment, you would want to add:
+// - Error handling middleware
+// - Request validation
+// - Authentication/authorization
+// - HTTPS support
+// - Rate limiting

@@ -1,70 +1,74 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Stress Predictor Application
 
-## Available Scripts
+This application helps users assess their stress levels and provides personalized recommendations for stress management.
 
-In the project directory, you can run:
+## Project Structure
 
-### `npm start`
+The project consists of three main parts:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **React Frontend** - A user-friendly interface for taking the stress assessment
+2. **Node.js Backend** - A server that processes requests and communicates with the model
+3. **Python ML Model** - A machine learning model that predicts stress levels
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v14+)
+- Python 3.8+
+- npm or yarn
 
-### `npm run build`
+### Frontend Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+# In the root directory
+npm install
+npm run dev
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Backend Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Navigate to the backend directory
+cd backend
 
-### `npm run eject`
+# Install Node.js dependencies
+npm install
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Install Python dependencies
+pip install -r requirements.txt
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Start the backend server
+npm run dev
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## How It Works
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Users complete a questionnaire about their stress, sleep, exercise, work-life balance, and relaxation.
+2. The frontend sends this data to the Node.js backend.
+3. The backend passes the data to a Python script that runs a Random Forest model.
+4. The model predicts a stress score and generates personalized recommendations.
+5. Results are displayed to the user in a visually appealing way.
 
-## Learn More
+## Model Details
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The stress prediction model uses a Random Forest algorithm trained on synthetic data that represents patterns of how various lifestyle factors affect stress levels. Features include:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Self-reported current stress level
+- Hours of sleep
+- Exercise frequency
+- Work-life balance quality
+- Frequency of relaxation techniques
 
-### Code Splitting
+The model outputs a stress score (0-100) and customized recommendations based on the user's specific answers.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Development Notes
 
-### Analyzing the Bundle Size
+- In production, the model would be pre-trained and saved to disk, then loaded when needed.
+- The synthetic dataset generation is included for demonstration purposes; a real application would use actual data.
+- The frontend includes fallback logic to ensure functionality even if the backend is unavailable.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## License
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[MIT License](LICENSE)
